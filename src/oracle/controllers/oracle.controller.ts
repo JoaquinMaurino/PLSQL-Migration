@@ -1,13 +1,14 @@
 import { Controller, Get } from '@nestjs/common';
-import { OracleService } from '../services/oracle.service';
+import { OrcaleProceduresService } from '../services/orcale_procedures.service';
 
 @Controller('oracle')
 export class OracleController {
-    constructor(private readonly oracleService: OracleService) { }
+  constructor(
+    private readonly oracleProceduresService: OrcaleProceduresService,
+  ) {}
 
-    @Get('stored-procedure')
-    async procedure() {
-        const result = await this.oracleService.ejecutarStoredProcedure();
-        return { result }
-    }
+  @Get('employees')
+  async getEmployees() {
+    return await this.oracleProceduresService.getEmployees();
+  }
 }
