@@ -35,6 +35,7 @@ export class OrcaleProceduresService {
         {
           cursor: { dir: oracledb.BIND_OUT, type: oracledb.CURSOR },
         },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT}
       );
       if (!result.outBinds) throw new Error('outBinds.cursor is undefined');
       const resultSet = result.outBinds.cursor;
