@@ -14,10 +14,10 @@ const initialForm = {
   DEPARTMENT_ID: '',
 };
 
+
 const EmployeeForm = ({ onSuccess }) => {
   const [formData, setFormData] = useState(initialForm);
   const [message, setMessage] = useState('');
-  const [showModal, setShowModal] = useState(false);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -45,7 +45,6 @@ const EmployeeForm = ({ onSuccess }) => {
       const result = await res.text();
       setMessage(result);
       setFormData(initialForm);
-      setShowModal(false);
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error('Error al dar de alta:', err);
@@ -54,38 +53,28 @@ const EmployeeForm = ({ onSuccess }) => {
   };
 
   return (
-    <>
-      <button onClick={() => setShowModal(true)} style={{ margin: '1rem 0' }}>
-        + Alta de Empleado
-      </button>
+    <div className="employee-form-container">
+      <h2>Alta de Empleado</h2>
+      <form onSubmit={handleSubmit}>
+        {Object.keys(initialForm).map(field => (
+          <label key={field}>
+            {field.replace(/_/g, ' ')}:
+            <input
+              type={field === 'HIRE_DATE' ? 'date' : 'text'}
+              name={field}
+              value={formData[field]}
+              onChange={handleChange}
+              required={['LAST_NAME', 'EMAIL', 'HIRE_DATE', 'JOB_ID'].includes(field)}
+            />
+          </label>
+        ))}
 
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <span className="close-btn" onClick={() => setShowModal(false)}>&times;</span>
-            <h2>Alta de Empleado</h2>
-            <form onSubmit={handleSubmit}>
-              {Object.keys(initialForm).map(field => (
-                <label key={field}>
-                  {field.replace(/_/g, ' ')}:
-                  <input
-                    type={field === 'HIRE_DATE' ? 'date' : 'text'}
-                    name={field}
-                    value={formData[field]}
-                    onChange={handleChange}
-                    required={['LAST_NAME', 'EMAIL', 'HIRE_DATE', 'JOB_ID'].includes(field)}
-                  />
-                </label>
-              ))}
-
-              <button type="submit">Cargar Empleado</button>
-            </form>
-            {message && <p><strong>{message}</strong></p>}
-          </div>
-        </div>
-      )}
-    </>
+        <button type="submit">Cargar Empleado</button>
+      </form>
+      {message && <p><strong>{message}</strong></p>}
+    </div>
   );
 };
+
 
 export default EmployeeForm;

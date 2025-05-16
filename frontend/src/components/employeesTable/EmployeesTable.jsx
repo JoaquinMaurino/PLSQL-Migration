@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './EmployeesTable.css';
 
-const EmployeeTable = ({ reloadTrigger }) => {
+const EmployeesTable = ({ reloadTrigger = false }) => {
   const [employees, setEmployees] = useState([]);
   const [visibleEmployees, setVisibleEmployees] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,4 +111,4 @@ useEffect(() => {
   );
 };
 
-export default EmployeeTable;
+export default EmployeesTable;
