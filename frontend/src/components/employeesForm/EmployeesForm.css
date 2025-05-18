@@ -54,3 +54,17 @@
 .modal-content button:hover {
   background-color: #005fce;
 }
+
+.close-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #aaa;
+  transition: color 0.2s ease-in-out;
+}
+
+.close-btn:hover {
+  color: #000;
+}

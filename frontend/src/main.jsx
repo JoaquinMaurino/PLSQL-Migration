@@ -1,6 +1,11 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
+import { EmployeesProvider } from './context/EmployeesContext.jsx';
 
 const root = document.getElementById('root');
-createRoot(root).render(<App />);
+createRoot(root).render(
+    <EmployeesProvider>
+        <App />
+    </EmployeesProvider>
+);

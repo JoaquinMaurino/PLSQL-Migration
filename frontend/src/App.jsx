@@ -1,13 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
-
 import Navbar from './components/navbar/Navbar';
 import EmployeeTable from './components/employeesTable/EmployeesTable';
 import EmployeeForm from './components/employeesForm/EmployeesForm';
 
 function App() {
-  const [reloadTrigger, setReloadTrigger] = useState(false);
-
   return (
     <Router>
       <Navbar />
@@ -21,14 +17,8 @@ function App() {
             </div>
           }
         />
-        <Route
-          path="/empleados"
-          element={<EmployeeTable reloadTrigger={reloadTrigger} />}
-        />
-        <Route
-          path="/alta"
-          element={<EmployeeForm onSuccess={() => setReloadTrigger(!reloadTrigger)} />}
-        />
+        <Route path="/empleados" element={<EmployeeTable />} />
+        <Route path="/alta" element={<EmployeeForm />} />
       </Routes>
     </Router>
   );
