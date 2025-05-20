@@ -95,4 +95,69 @@ export class OrcaleProceduresService {
       throw error;
     }
   }
+
+  async bajaEmpleadoPorId(employeeId: number): Promise<string> {
+    try {
+      console.log(employeeId);
+      const result = await this.connection.execute<{
+        p_nota_sal: string;
+      }>(
+        `
+        BEGIN
+          HR.PKG_TEST_HR_EMPLOY.BAJA_EMPLOYEE_ID(:p_EMPLOYEE_ID, :p_nota_sal);
+        END;
+      `,
+        {
+          p_EMPLOYEE_ID: employeeId,
+          p_nota_sal: {
+            dir: oracledb.BIND_OUT,
+            type: oracledb.STRING,
+            maxSize: 1000,
+          },
+        },
+        {
+          outFormat: oracledb.OUT_FORMAT_OBJECT,
+        },
+      );
+      console.log('OUTBINDS: ', result.outBinds);
+      return (
+        result.outBinds?.p_nota_sal ||
+        'No se recibió respuesta del procedimiento.'
+      );
+    } catch (error) {
+      console.error('Error ejecutando BAJA_EMPLOYEE_ID:', error);
+      throw new Error('Falló la baja del empleado.');
+    }
+  }
+  async bajaEmpleadoPorEmail(email: string): Promise<string> {
+    try {
+      const result = await this.connection.execute<{
+        p_nota_sal: string;
+      }>(
+        `
+        BEGIN
+          HR.PKG_TEST_HR_EMPLOY.BAJA_EMPLOYEE_EMAIL(:p_EMAIL, :p_nota_sal);
+        END;
+      `,
+        {
+          p_EMAIL: email,
+          p_nota_sal: {
+            dir: oracledb.BIND_OUT,
+            type: oracledb.STRING,
+            maxSize: 1000,
+          },
+        },
+        {
+          outFormat: oracledb.OUT_FORMAT_OBJECT,
+        },
+      );
+      return (
+        result.outBinds?.p_nota_sal ||
+        'No se recibió respuesta del procedimiento.'
+      );
+    } catch (error) {
+      console.error('Error ejecutando BAJA_EMPLOYEE_EMAIL:', error);
+      throw new Error('Falló la baja del empleado.');
+    }
+  }
 }
