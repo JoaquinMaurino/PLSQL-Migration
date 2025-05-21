@@ -1,6 +1,9 @@
 import { useState, useEffect, useContext } from 'react';
+import { FaTrashAlt, FaEdit } from 'react-icons/fa';
+
 import './EmployeesTable.css';
 import { EmployeesContext } from '../../context/EmployeesContext';
+import EmployeesForm from '../employeesForm/EmployeesForm';
 
 const EmployeesTable = () => {
   const { reloadTrigger, triggerReload } = useContext(EmployeesContext);
@@ -11,13 +14,17 @@ const EmployeesTable = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
 
+  const [editingEmployee, setEditingEmployee] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [formMode, setFormMode] = useState('create');
+
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
         const res = await fetch('http://localhost:3000/oracle/employees');
         const data = await res.json();
         setEmployees(data);
-        setCurrentPage(1); // Reiniciar paginación al cargar
+        setCurrentPage(1);
       } catch (err) {
         console.error('Error fetching employees:', err);
       }
@@ -31,7 +38,7 @@ const EmployeesTable = () => {
     if (!confirm) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/oracle/baja-employee/${id}`, {
+      const res = await fetch(`http://localhost:3000/oracle/baja-employee-id/${id}`, {
         method: 'DELETE',
       });
       const msg = await res.text();
@@ -43,10 +50,8 @@ const EmployeesTable = () => {
     }
   };
 
-  // Filtrado
   const filteredEmployees = employees.filter(emp => {
     if (!searchTerm.trim()) return true;
-
     const value = emp[searchField];
     if (!value) return false;
 
@@ -66,6 +71,14 @@ const EmployeesTable = () => {
   return (
     <div className="employee-container">
       <h1>Empleados</h1>
+
+      <button onClick={() => {
+        setFormMode('create');
+        setEditingEmployee(null);
+        setShowModal(true);
+      }} style={{ margin: '1rem 0' }}>
+        Nuevo +
+      </button>
 
       <div className="employee-controls">
         <label>Mostrar:
@@ -111,7 +124,7 @@ const EmployeesTable = () => {
             <th>Apellido</th>
             <th>Email</th>
             <th>Fecha de Ingreso</th>
-            <th>Acciones</th> {/* 👈 Nueva columna */}
+            <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
@@ -123,24 +136,59 @@ const EmployeesTable = () => {
               <td>{emp.EMAIL}</td>
               <td>{new Date(emp.HIRE_DATE).toLocaleDateString()}</td>
               <td>
-                <button onClick={() => handleDelete(emp.EMPLOYEE_ID)} className="btn-delete">
-                  Eliminar
+                <button
+                  onClick={() => handleDelete(emp.EMPLOYEE_ID)}
+                  className="icon-button delete"
+                  title="Eliminar"
+                >
+                  <FaTrashAlt />
+                </button>
+
+                <button
+                  onClick={() => {
+                    setFormMode('edit');
+                    setEditingEmployee(emp);
+                    setShowModal(true);
+                  }}
+                  className="icon-button edit"
+                  title="Actualizar"
+                >
+                  <FaEdit />
                 </button>
               </td>
+
             </tr>
           ))}
         </tbody>
       </table>
 
-      <div className="pagination-controls">
-        <button onClick={() => setCurrentPage(p => Math.max(p - 1, 1))} disabled={currentPage === 1}>
-          Anterior
+      <div className="pagination">
+        <button
+          onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+        >
+          « Anterior
         </button>
+
         <span>Página {currentPage} de {totalPages}</span>
-        <button onClick={() => setCurrentPage(p => Math.min(p + 1, totalPages))} disabled={currentPage === totalPages}>
-          Siguiente
+
+        <button
+          onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+          disabled={currentPage === totalPages}
+        >
+          Siguiente »
         </button>
       </div>
+
+
+
+      {showModal && (
+        <EmployeesForm
+          mode={formMode}
+          employeeData={editingEmployee}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 };

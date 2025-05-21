@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/navbar/Navbar';
 import EmployeeTable from './components/employeesTable/EmployeesTable';
-import EmployeeForm from './components/employeesForm/EmployeesForm';
 
 function App() {
   return (
@@ -18,7 +17,6 @@ function App() {
           }
         />
         <Route path="/empleados" element={<EmployeeTable />} />
-        <Route path="/alta" element={<EmployeeForm />} />
       </Routes>
     </Router>
   );

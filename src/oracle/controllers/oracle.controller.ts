@@ -7,9 +7,11 @@ import {
   Param,
   ParseIntPipe,
   Query,
+  Put,
 } from '@nestjs/common';
 import { OrcaleProceduresService } from '../services/orcale_procedures.service';
 import { CreateEmployeeDto } from '../dtos/alta-employee.dto';
+import { UpdateEmployeeDto } from '../dtos/actualizar-employee.dto';
 
 @Controller('oracle')
 export class OracleController {
@@ -35,5 +37,10 @@ export class OracleController {
   @Delete('baja-employee-email')
   async bajaEmployeeEmail(@Query('email') email: string) {
     return await this.oracleProceduresService.bajaEmpleadoPorEmail(email);
+  }
+
+  @Put('actualizar-employee/:id')
+  async actualizarEmpleado(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateEmployeeDto){
+    return await this.oracleProceduresService.actualizarEmpleado(id, data)
   }
 }

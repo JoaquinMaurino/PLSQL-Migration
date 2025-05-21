@@ -2,6 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import * as oracledb from 'oracledb';
 
 import { CreateEmployeeDto } from '../dtos/alta-employee.dto';
+import { UpdateEmployeeDto } from '../dtos/actualizar-employee.dto';
 
 export interface Employee {
   EMPLOYEE_ID: number;
@@ -89,7 +90,7 @@ export class OrcaleProceduresService {
         },
         { outFormat: oracledb.OUT_FORMAT_OBJECT },
       );
-      return result.outBinds?.p_sal_err || 'Alta realizada exitosamente';
+      return result.outBinds?.p_sal_err || 'Alta exitosa';
     } catch (error) {
       console.error('Error al ejecutar ALTA_EMPLOYEE:', error);
       throw error;
@@ -98,7 +99,6 @@ export class OrcaleProceduresService {
 
   async bajaEmpleadoPorId(employeeId: number): Promise<string> {
     try {
-      console.log(employeeId);
       const result = await this.connection.execute<{
         p_nota_sal: string;
       }>(
@@ -119,7 +119,6 @@ export class OrcaleProceduresService {
           outFormat: oracledb.OUT_FORMAT_OBJECT,
         },
       );
-      console.log('OUTBINDS: ', result.outBinds);
       return (
         result.outBinds?.p_nota_sal ||
         'No se recibió respuesta del procedimiento.'
@@ -158,6 +157,57 @@ export class OrcaleProceduresService {
     } catch (error) {
       console.error('Error ejecutando BAJA_EMPLOYEE_EMAIL:', error);
       throw new Error('Falló la baja del empleado.');
+    }
+  }
+
+  async actualizarEmpleado(
+    employeeId: number,
+    data: UpdateEmployeeDto,
+  ): Promise<string> {
+    try {
+      const result = await this.connection.execute<{ p_sal_err: string }>(
+        `
+          BEGIN
+            HR.PKG_TEST_HR_EMPLOY.ACTUALIZACION_EMPLOYEE(
+              :EMPLOYEE_ID,
+              :FIRST_NAME,
+              :LAST_NAME,
+              :EMAIL,
+              :PHONE_NUMBER,
+              :HIRE_DATE,
+              :JOB_ID,
+              :SALARY,
+              :COMMISSION_PCT,
+              :MANAGER_ID,
+              :DEPARTMENT_ID,
+              :p_sal_err  
+            );
+          END;
+        `,
+        {
+          EMPLOYEE_ID: employeeId,
+          FIRST_NAME: data.FIRST_NAME ?? null,
+          LAST_NAME: data.LAST_NAME ?? null,
+          EMAIL: data.EMAIL ?? null,
+          PHONE_NUMBER: data.PHONE_NUMBER ?? null,
+          HIRE_DATE: data.HIRE_DATE ? new Date(data.HIRE_DATE) : null,
+          JOB_ID: data.JOB_ID ?? null,
+          SALARY: data.SALARY ?? null,
+          COMMISSION_PCT: data.COMMISSION_PCT ?? null,
+          MANAGER_ID: data.MANAGER_ID ?? null,
+          DEPARTMENT_ID: data.DEPARTMENT_ID ?? null,
+          p_sal_err: {
+            dir: oracledb.BIND_OUT,
+            type: oracledb.STRING,
+            maxSize: 200,
+          },
+        },
+        { outFormat: oracledb.OUT_FORMAT_OBJECT },
+      );
+      return result.outBinds?.p_sal_err || 'Actualizacion exitosa';
+    } catch (error) {
+      console.error('Error al ejecutar ACTUALIZACION_EMPLOYEE:', error);
+      throw error;
     }
   }
 }

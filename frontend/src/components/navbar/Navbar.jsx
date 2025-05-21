@@ -11,9 +11,6 @@ const Navbar = () => {
       <NavLink to="/empleados" className="nav-link" activeclassname="active">
         Empleados
       </NavLink>
-      <NavLink to="/alta" className="nav-link" activeclassname="active">
-        Cargar Empleado
-      </NavLink>
     </nav>
   );
 };
