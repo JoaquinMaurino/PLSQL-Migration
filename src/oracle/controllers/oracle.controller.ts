@@ -9,38 +9,41 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-import { OrcaleProceduresService } from '../services/orcale_procedures.service';
+import { OracleService } from '../services/oracle.service';
 import { CreateEmployeeDto } from '../dtos/alta-employee.dto';
 import { UpdateEmployeeDto } from '../dtos/actualizar-employee.dto';
 
 @Controller('oracle')
 export class OracleController {
-  constructor(
-    private readonly oracleProceduresService: OrcaleProceduresService,
-  ) {}
+  constructor(private readonly oracleService: OracleService) {}
 
   @Get('employees')
-  async getEmployees() {
-    return await this.oracleProceduresService.getEmployees();
+  async getEmpleados() {
+    return await this.oracleService.getEmpleados();
+  }
+
+  @Get('employees/:id')
+  async getEmpleadoId(@Param('id', ParseIntPipe) id: number) {
+    return await this.oracleService.getEmpleadoId(id);
   }
 
   @Post('alta-employee')
   async altaEmployee(@Body() data: CreateEmployeeDto) {
-    return await this.oracleProceduresService.altaEmpleado(data);
+    return await this.oracleService.altaEmpleado(data);
   }
 
   @Delete('baja-employee-id/:id')
   async bajaEmployeeId(@Param('id', ParseIntPipe) id: number) {
-    return await this.oracleProceduresService.bajaEmpleadoPorId(id);
+    return await this.oracleService.bajaEmpleadoPorId(id);
   }
 
   @Delete('baja-employee-email')
   async bajaEmployeeEmail(@Query('email') email: string) {
-    return await this.oracleProceduresService.bajaEmpleadoPorEmail(email);
+    return await this.oracleService.bajaEmpleadoPorEmail(email);
   }
 
   @Put('actualizar-employee/:id')
   async actualizarEmpleado(@Param('id', ParseIntPipe) id: number, @Body() data: UpdateEmployeeDto){
-    return await this.oracleProceduresService.actualizarEmpleado(id, data)
+    return await this.oracleService.actualizarEmpleado(id, data)
   }
 }
