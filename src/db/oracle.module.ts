@@ -1,14 +1,9 @@
 import { Module, Global } from '@nestjs/common';
 import * as oracledb from 'oracledb';
-import { OrcaleProceduresService } from './services/orcale_procedures.service';
-import { OracleService } from './services/oracle.service';
-import { OracleController } from './controllers/oracle.controller';
 
 @Global()
 @Module({
   providers: [
-    OrcaleProceduresService,
-    OracleService,
     {
       provide: 'ORACLE_CONNECTION',
       useFactory: async () => {
@@ -32,7 +27,6 @@ import { OracleController } from './controllers/oracle.controller';
       },
     },
   ],
-  controllers: [OracleController],
   exports: ['ORACLE_CONNECTION'],
 })
 export class OracleModule {}
