@@ -9,13 +9,13 @@ import {
   Query,
   Put,
 } from '@nestjs/common';
-import { EmpleadosService } from '../service/empleados.service';
+import { EmployeesService } from '../service/employees.service';
 import { CreateEmployeeDto } from '../dto/empleado.dto';
 import { UpdateEmployeeDto } from '../dto/actualizar-empleado';
 
 @Controller('empleados')
-export class EmpleadosController {
-  constructor(private readonly empleadosService: EmpleadosService) {}
+export class EmployeesController {
+  constructor(private readonly empleadosService: EmployeesService) {}
 
   @Get()
   async getEmpleados() {

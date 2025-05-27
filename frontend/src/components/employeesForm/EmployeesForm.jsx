@@ -72,8 +72,8 @@ const EmployeesForm = ({ mode = 'create', employeeData = null, onClose }) => {
     };
 
     const url = mode === 'edit'
-      ? `http://localhost:3000/oracle/actualizar-employee/${employeeData.EMPLOYEE_ID}`
-      : 'http://localhost:3000/oracle/alta-employee';
+      ? `http://localhost:3000/empleados/${employeeData.EMPLOYEE_ID}`
+      : 'http://localhost:3000/empleados';
 
     const method = mode === 'edit' ? 'PUT' : 'POST';
 

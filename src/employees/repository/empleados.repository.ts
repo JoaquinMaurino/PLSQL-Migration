@@ -4,7 +4,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import * as oracledb from 'oracledb';
 import { CreateEmployeeDto } from '../dto/empleado.dto';
 import { UpdateEmployeeDto } from '../dto/actualizar-empleado';
-import { Employee } from '../entities/empleados.entity';
+import { Employee } from '../entities/employees.entity';
 
 @Injectable()
 export class EmpleadosRepository {

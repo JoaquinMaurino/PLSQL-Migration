@@ -3,11 +3,11 @@ import * as oracledb from 'oracledb';
 
 import { CreateEmployeeDto } from '../dto/empleado.dto';
 import { UpdateEmployeeDto } from '../dto/actualizar-empleado';
-import { Employee } from '../entities/empleados.entity';
+import { Employee } from '../entities/employees.entity';
 import { EmpleadosRepository } from '../repository/empleados.repository';
 
 @Injectable()
-export class EmpleadosService {
+export class EmployeesService {
   constructor(
     @Inject('ORACLE_CONNECTION')
     private readonly connection: oracledb.Connection,
@@ -177,6 +177,7 @@ export class EmpleadosService {
       const deptChanged =
         data.DEPARTMENT_ID && data.DEPARTMENT_ID !== oldDeptId;
 
+      // Logica del tigger de la tabla employees que modifica la tabla job_hisotry
       if (jobChanged || deptChanged) {
         await this.employeeRepository.updateJobHistoryIfNeeded(
           id,

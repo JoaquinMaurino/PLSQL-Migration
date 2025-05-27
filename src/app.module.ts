@@ -4,7 +4,9 @@ import { AppService } from './app.service';
 
 import { OracleModule } from './db/oracle.module';
 import { ConfigModule } from '@nestjs/config';
-import { EmpleadosModule } from './empleados/empleados.module';
+import { EmployeesModule } from './employees/employees.module';
+import { CountriesModule } from './countries/countries.module';
+import { DepartmentsModule } from './departments/departments.module';
 
 @Module({
   imports: [
@@ -12,7 +14,9 @@ import { EmpleadosModule } from './empleados/empleados.module';
       isGlobal: true,
     }),
     OracleModule,
-    EmpleadosModule],
+    EmployeesModule,
+    CountriesModule,
+    DepartmentsModule],
   controllers: [AppController],
   providers: [AppService],
 })

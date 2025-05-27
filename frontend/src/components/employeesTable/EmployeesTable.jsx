@@ -21,7 +21,7 @@ const EmployeesTable = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await fetch('http://localhost:3000/oracle/employees');
+        const res = await fetch('http://localhost:3000/empleados');
         const data = await res.json();
         setEmployees(data);
         setCurrentPage(1);
@@ -38,7 +38,7 @@ const EmployeesTable = () => {
     if (!confirm) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/oracle/baja-employee-id/${id}`, {
+      const res = await fetch(`http://localhost:3000/empleados/${id}`, {
         method: 'DELETE',
       });
       const msg = await res.text();
