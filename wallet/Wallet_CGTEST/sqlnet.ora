@@ -1,2 +1,2 @@
-WALLET_LOCATION = (SOURCE = (METHOD = file) (METHOD_DATA = (DIRECTORY="C:/Users/JMaurino.NB54/Desktop/PLSQL-Migration/wallet/Wallet_CGTEST")))
+WALLET_LOCATION = (SOURCE = (METHOD = file) (METHOD_DATA = (DIRECTORY="C:\Users\Joaquitoxfit\Desktop\Desarrollo\migration-project\db\Wallet_CGTEST")))
 SSL_SERVER_DN_MATCH=yes
