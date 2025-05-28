@@ -1,50 +1,48 @@
-import { Injectable, Inject } from '@nestjs/common';
-import * as oracledb from 'oracledb';
+import { Injectable } from '@nestjs/common';
 
-import { CreateEmployeeDto } from '../dto/empleado.dto';
-import { UpdateEmployeeDto } from '../dto/actualizar-empleado';
+import { CreateEmployeeDto, UpdateEmployeeDto } from '../dto/employees.dto';
 import { Employee } from '../entities/employees.entity';
-import { EmpleadosRepository } from '../repository/empleados.repository';
+import { EmployeesRepository } from '../repository/employees.repository';
+
+import { JobHistoryRepository } from '../../job-history/repository/job-history.repository';
 
 @Injectable()
 export class EmployeesService {
   constructor(
-    @Inject('ORACLE_CONNECTION')
-    private readonly connection: oracledb.Connection,
-    private readonly employeeRepository: EmpleadosRepository,
+    private readonly employeesRepo: EmployeesRepository,
+    private readonly jobHistRepo: JobHistoryRepository,
   ) {}
 
   async getEmpleados(): Promise<Employee[]> {
     try {
-      return await this.employeeRepository.findAll();
+      return await this.employeesRepo.findAll();
     } catch (error) {
       console.error('Error obteniendo empleados:', error);
       throw error;
     }
   }
 
-  async getEmpleadoId(id: number): Promise<Employee | string> {
+  async getEmpleadoId(
+    id: number,
+  ): Promise<{ success: boolean; data: Employee | string }> {
     try {
-      const empleado = await this.employeeRepository.findById(id);
-
-      if (!empleado) {
-        return `Empleado con ID ${id} no encontrado`;
-      }
-
-      return empleado;
+      const employee = await this.employeesRepo.findById(id);
+      if (!employee)
+        return { success: false, data: `Employee with ID: ${id} not found` };
+      return { success: true, data: employee };
     } catch (error) {
       const errorMessage = error.message || 'Error desconocido';
       const errorCode = error.errorNum || 0;
 
-      try {
-        await this.employeeRepository.logError(
-          errorCode,
-          errorMessage,
-          'NodeJS.getEmpleadoId',
-        );
-      } catch (logError) {
-        console.error('No se pudo registrar en log_errors:', logError);
-      }
+      // try {
+      //   await this.employeeRepository.logError(
+      //     errorCode,
+      //     errorMessage,
+      //     'NodeJS.getEmpleadoId',
+      //   );
+      // } catch (logError) {
+      //   console.error('No se pudo registrar en log_errors:', logError);
+      // }
 
       throw new Error(errorMessage);
     }
@@ -63,23 +61,22 @@ export class EmployeesService {
     }
 
     try {
-      const newId = await this.employeeRepository.getNextEmployeeId();
-      await this.employeeRepository.insertEmployee(newId, data);
+      const newEmployee = await this.employeesRepo.insertEmployee(data);
 
-      return `Se agregó el empleado sin inconvenientes, con el ID: ${newId}`;
+      return `Se agregó el empleado sin inconvenientes, con el ID: ${newEmployee.EMPLOYEE_ID}`;
     } catch (error: any) {
       const errorMessage = error.message || 'Error desconocido';
       const errorCode = error.errorNum || 0;
 
-      try {
-        await this.employeeRepository.logError(
-          errorCode,
-          errorMessage,
-          'NodeJS.altaEmpleado',
-        );
-      } catch (logError) {
-        console.error('No se pudo registrar en log_errors:', logError);
-      }
+      // try {
+      //   await this.employeeRepository.logError(
+      //     errorCode,
+      //     errorMessage,
+      //     'NodeJS.altaEmpleado',
+      //   );
+      // } catch (logError) {
+      //   console.error('No se pudo registrar en log_errors:', logError);
+      // }
 
       throw new Error(errorMessage);
     }
@@ -89,31 +86,24 @@ export class EmployeesService {
     if (!id) {
       return 'Para eliminar un empleado el id del mismo es requerido';
     }
-
     try {
-      await this.employeeRepository.deleteJobHistoryByEmployeeId(id);
-      const rowsAffected = await this.employeeRepository.deleteEmployeeById(id);
+      await this.jobHistRepo.deleteJobHistoryByEmployeeId(id);
+      await this.employeesRepo.deleteEmployeeById(id);
 
-      if (rowsAffected === 1) {
-        await this.employeeRepository.commit();
-        return `Se elimino el empleado con id: ${id}`;
-      } else {
-        await this.employeeRepository.rollback();
-        return `No se encontro un empleado con id: ${id}`;
-      }
+      return `Se elimino el empleado con id: ${id}`;
     } catch (error: any) {
       const errorMessage = error.message || 'Error desconocido';
       const errorCode = error.errorNum || 0;
 
-      try {
-        await this.employeeRepository.logError(
-          errorCode,
-          errorMessage,
-          'NodeJS.bajaEmpleadoPorId',
-        );
-      } catch (logError) {
-        console.error('No se pudo registrar en LOG_ERRORS:', logError);
-      }
+      // try {
+      //   await this.employeeRepository.logError(
+      //     errorCode,
+      //     errorMessage,
+      //     'NodeJS.bajaEmpleadoPorId',
+      //   );
+      // } catch (logError) {
+      //   console.error('No se pudo registrar en LOG_ERRORS:', logError);
+      // }
 
       throw new Error('Falló la baja del empleado.');
     }
@@ -123,31 +113,22 @@ export class EmployeesService {
     if (!email) {
       return 'Para el borrado de un empleado es obligatorio el envío del email.';
     }
-
     try {
-      const rowsAffected =
-        await this.employeeRepository.deleteEmployeeByEmail(email);
-
-      if (rowsAffected === 1) {
-        await this.employeeRepository.commit();
-        return `Se eliminó correctamente el empleado con email: ${email}`;
-      } else {
-        await this.employeeRepository.rollback();
-        return `No se encontró ningún empleado con email: ${email}`;
-      }
+      await this.employeesRepo.deleteEmployeeByEmail(email);
+      return `Se eliminó correctamente el empleado con email: ${email}`;
     } catch (error: any) {
       const errorMessage = error.message || 'Error desconocido';
       const errorCode = error.errorNum || 0;
 
-      try {
-        await this.employeeRepository.logError(
-          errorCode,
-          errorMessage,
-          'NodeJS.bajaEmpleadoPorEmail',
-        );
-      } catch (logError) {
-        console.error('No se pudo registrar en LOG_ERRORS:', logError);
-      }
+      // try {
+      //   await this.employeeRepository.logError(
+      //     errorCode,
+      //     errorMessage,
+      //     'NodeJS.bajaEmpleadoPorEmail',
+      //   );
+      // } catch (logError) {
+      //   console.error('No se pudo registrar en LOG_ERRORS:', logError);
+      // }
 
       throw new Error(
         'Error al intentar eliminar el empleado. Ver logs para más información.',
@@ -164,8 +145,7 @@ export class EmployeesService {
     }
 
     try {
-      const current =
-        await this.employeeRepository.findJobAndDepartmentById(id);
+      const current = await this.employeesRepo.findJobAndDepartmentById(id);
 
       if (!current) {
         return `No se actualizó a ningún empleado. El Id de empleado: ${id} no existe.`;
@@ -179,32 +159,28 @@ export class EmployeesService {
 
       // Logica del tigger de la tabla employees que modifica la tabla job_hisotry
       if (jobChanged || deptChanged) {
-        await this.employeeRepository.updateJobHistoryIfNeeded(
+        await this.jobHistRepo.updateJobHistoryIfNeeded(
           id,
           jobChanged ? data.JOB_ID : null,
           deptChanged ? data.DEPARTMENT_ID : null,
         );
       }
 
-      await this.employeeRepository.updateEmployee(id, data);
-
-      await this.employeeRepository.commit();
+      await this.employeesRepo.updateEmployee(id, data);
 
       return `Se Actualizó sin inconvenientes el empleado de Id: ${id}`;
     } catch (error: any) {
       console.error('Error al actualizar empleado:', error);
 
-      try {
-        await this.employeeRepository.logError(
-          error.errorNum ?? -1,
-          error.message?.substring(0, 200) ?? 'Error desconocido',
-          'hr.ACTUALIZACION_EMPLOYEE',
-        );
-      } catch (logError) {
-        console.error('Error al registrar en log_errors:', logError);
-      }
-
-      await this.employeeRepository.rollback();
+      // try {
+      //   await this.employeeRepository.logError(
+      //     error.errorNum ?? -1,
+      //     error.message?.substring(0, 200) ?? 'Error desconocido',
+      //     'hr.ACTUALIZACION_EMPLOYEE',
+      //   );
+      // } catch (logError) {
+      //   console.error('Error al registrar en log_errors:', logError);
+      // }
 
       throw new Error(
         'Error al intentar actualizar el empleado. Ver logs para más información.',
