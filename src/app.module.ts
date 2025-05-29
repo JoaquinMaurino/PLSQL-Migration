@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 import * as oracledb from 'oracledb';
 import { join } from 'path';
 
@@ -45,6 +46,7 @@ import { LogErrorsModule } from './log-errors/log-errors.module';
         };
       },
     }),
+    EventEmitterModule.forRoot(),
     EmployeesModule,
     CountriesModule,
     DepartmentsModule,

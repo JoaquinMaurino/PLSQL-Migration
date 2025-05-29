@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 import { CreateEmployeeDto, UpdateEmployeeDto } from '../dto/employees.dto';
 import { Employee } from '../entities/employees.entity';
@@ -11,6 +12,7 @@ export class EmployeesService {
   constructor(
     private readonly employeesRepo: EmployeesRepository,
     private readonly jobHistRepo: JobHistoryRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async getEmpleados(): Promise<Employee[]> {
@@ -139,36 +141,68 @@ export class EmployeesService {
   async actualizarEmpleado(
     id: number,
     data: UpdateEmployeeDto,
-  ): Promise<string> {
-    if (!id) {
-      return 'Para actualizar a un empleado es obligatorio el envío del Código del Empleado.';
+  ): Promise<string | {}> {
+    const employee = await this.employeesRepo.findById(id);
+    if (!employee) {
+      return `Employee with ID: ${id} not found`;
     }
 
     try {
-      const current = await this.employeesRepo.findJobAndDepartmentById(id);
-
-      if (!current) {
-        return `No se actualizó a ningún empleado. El Id de empleado: ${id} no existe.`;
+      //Obtener valores actuales de JOB_ID  y DEPARTMENT_ID
+      const currentData =
+        await this.employeesRepo.findJobDepartmentAndHireDateById(id);
+      if (!currentData) {
+        return `An error ocurred, data not found.`;
       }
+      console.log('Current data:', JSON.stringify(currentData, null, 2));
 
-      const { JOB_ID: oldJobId, DEPARTMENT_ID: oldDeptId } = current;
+      const {
+        e_JOB_ID: currentJobId,
+        e_DEPARTMENT_ID: currentDeptId,
+        e_HIRE_DATE: hireDate,
+      } = currentData;
 
-      const jobChanged = data.JOB_ID && data.JOB_ID !== oldJobId;
+      //Verificar si estos dos campos fueron modificados
+      const jobChanged = data.JOB_ID && data.JOB_ID !== currentJobId;
       const deptChanged =
-        data.DEPARTMENT_ID && data.DEPARTMENT_ID !== oldDeptId;
+        data.DEPARTMENT_ID && data.DEPARTMENT_ID !== currentDeptId;
 
       // Logica del tigger de la tabla employees que modifica la tabla job_hisotry
+      // Si JOB_ID o DEPARTMENT_ID cambiaron actualizo JOB_HISTORY
+      // if (jobChanged || deptChanged) {
+      //   await this.jobHistRepo.updateJobHistoryIfNeeded(
+      //     id,
+      //     jobChanged ? data.JOB_ID : null,
+      //     deptChanged ? data.DEPARTMENT_ID : null,
+      //     hireDate,
+      //   );
+      //   console.log('jobhistory updated');
+      // }
+
+      //Emitir evento para que lo maneje el listener como si fuera un trigger
       if (jobChanged || deptChanged) {
-        await this.jobHistRepo.updateJobHistoryIfNeeded(
+        if (!hireDate) {
+          console.error('Invalid hireDate received:', hireDate);
+        }
+        this.eventEmitter.emit('employeeUpdated', {
           id,
-          jobChanged ? data.JOB_ID : null,
-          deptChanged ? data.DEPARTMENT_ID : null,
-        );
+          newJobId: data.JOB_ID ?? currentJobId,
+          newDeptId: data.DEPARTMENT_ID ?? currentDeptId,
+          hireDate,
+        });
+        console.log('Evento employeeUpdated emitido');
       }
 
-      await this.employeesRepo.updateEmployee(id, data);
-
-      return `Se Actualizó sin inconvenientes el empleado de Id: ${id}`;
+      // Actualizar solo ls campos que fueron enviados
+      const updated = await this.employeesRepo.updateEmployee(id, data);
+      if (!updated) {
+        return `Unable to update employee with ID: ${id}`;
+      }
+      return {
+        success: true,
+        message: `Employee with ID: ${id} successfully updated`,
+        data: updated,
+      };
     } catch (error: any) {
       console.error('Error al actualizar empleado:', error);
 

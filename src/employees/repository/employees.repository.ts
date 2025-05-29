@@ -76,21 +76,14 @@ export class EmployeesRepository {
     return await this.employeesRepo.save(updatedEmployee);
   }
 
-  async findJobAndDepartmentById(
-    id: number,
-  ): Promise<{ JOB_ID: string; DEPARTMENT_ID: number | null } | null> {
-    const result = await this.employeesRepo.findOne({
-      where: { EMPLOYEE_ID: id },
-      select: ['JOB_ID', 'DEPARTMENT_ID'],
-    });
+async findJobDepartmentAndHireDateById(id: number): Promise<any> {
+  return this.employeesRepo
+    .createQueryBuilder('e')
+    .select(['e.JOB_ID', 'e.DEPARTMENT_ID', 'e.HIRE_DATE'])
+    .where('e.EMPLOYEE_ID = :id', { id })
+    .getRawOne();
+}
 
-    if (!result) return null;
-
-    return {
-      JOB_ID: result.JOB_ID,
-      DEPARTMENT_ID: result.DEPARTMENT_ID ?? null,
-    };
-  }
 
   async getNextEmployeeId(): Promise<number> {
     const result = await this.dataSource.query(
