@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nestjs-oracle-backend-deployment
+  labels:
+    app: nestjs-oracle-backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nestjs-oracle-backend
+  template:
+    metadata:
+      labels:
+        app: nestjs-oracle-backend
+    spec:
+      containers:
+        - name: nestjs-oracle-backend-container
+          image: nestjs-oracle-backend:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: ORACLE_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: oracle-backend-config
+                  key: ORACLE_USER
+            - name: ORACLE_CONNECT_STRING
+              valueFrom:
+                configMapKeyRef:
+                  name: oracle-backend-config
+                  key: ORACLE_CONNECT_STRING
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: oracle-backend-config
+                  key: PORT
+            - name: ORACLE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: oracle-backend-secret
+                  key: ORACLE_PASSWORD
+            - name: ORACLE_CONFIG_DIR
+              value: "/opt/oracle/wallet"
+            - name: ORACLE_LIB_DIR
+              value: "/opt/oracle/instantclient/instantclient_21_17"
+          imagePullPolicy: Never

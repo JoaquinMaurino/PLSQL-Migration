@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: nestjs-oracle-backend-service # Nombre del servicio (el frontend lo usará para comunicarse)
+  labels:
+    app: nestjs-oracle-backend
+spec:
+  selector:
+    app: nestjs-oracle-backend # Selecciona los Pods con esta etiqueta
+  ports:
+    - protocol: TCP
+      port: 3000 # Puerto en el que el servicio escuchará (dentro del clúster)
+      targetPort: 3000 # Puerto del contenedor al que se redirigirá el tráfico
+  type: ClusterIP # Este tipo de servicio solo es accesible dentro del clúster

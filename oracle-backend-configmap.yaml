@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oracle-backend-config
+  labels:
+    app: nestjs-oracle-backend
+data:
+  PORT: "3000"
+  ORACLE_USER: "HR"
+  ORACLE_CONNECT_STRING: "CGTEST_HIGH"

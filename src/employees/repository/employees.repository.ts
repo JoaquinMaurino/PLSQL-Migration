@@ -1,11 +1,7 @@
-// employee.repository.ts
 
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository, InjectDataSource } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Repository, UpdateResult } from 'typeorm';
-//import { Inject, Injectable } from '@nestjs/common';
-
-//import * as oracledb from 'oracledb';
 
 import { CreateEmployeeDto, UpdateEmployeeDto } from '../dto/employees.dto';
 import { Employee } from '../entities/employees.entity';
