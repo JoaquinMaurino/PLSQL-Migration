@@ -43,5 +43,5 @@ spec:
             - name: ORACLE_CONFIG_DIR
               value: "/opt/oracle/wallet"
             - name: ORACLE_LIB_DIR
-              value: "/opt/oracle/instantclient/instantclient_21_17"
+              value: "/opt/oracle/instantclient/instantclient_21_18"
           imagePullPolicy: Never

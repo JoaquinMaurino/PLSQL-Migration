@@ -28,6 +28,9 @@ import { LogErrorsModule } from './log-errors/log-errors.module';
       useFactory: async (configService: ConfigService) => {
         const libDir = configService.get<string>('ORACLE_LIB_DIR');
         const configDir = configService.get<string>('ORACLE_CONFIG_DIR');
+        const username = configService.get<string>('ORACLE_USER');
+        const password = configService.get<string>('ORACLE_PASSWORD');
+        const connectString = configService.get<string>('ORACLE_CONNECT_STRING');
 
         // Inicializamos Oracle Client
         oracledb.initOracleClient({
@@ -38,9 +41,9 @@ import { LogErrorsModule } from './log-errors/log-errors.module';
 
         return {
           type: 'oracle',
-          username: configService.get('ORACLE_USER'),
-          password: configService.get('ORACLE_PASSWORD'),
-          connectString: configService.get('ORACLE_CONNECT_STRING'),
+          username,
+          password,
+          connectString,
           entities: [join(__dirname, '/../**/*.entity.js')],
           synchronize: false,
         };
@@ -59,4 +62,4 @@ import { LogErrorsModule } from './log-errors/log-errors.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

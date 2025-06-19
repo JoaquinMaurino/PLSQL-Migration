@@ -1,7 +1,7 @@
 import { Module, Global } from '@nestjs/common';
 import * as oracledb from 'oracledb';
 
-@Global()
+/* @Global()
 @Module({
   providers: [
     {
@@ -29,4 +29,24 @@ import * as oracledb from 'oracledb';
   ],
   exports: ['ORACLE_CONNECTION'],
 })
-export class OracleModule {}
+export class OracleModule { } */
+
+
+async function testConnection() {
+  try {
+    oracledb.initOracleClient({ libDir: 'E:\instantclient_23_8' });
+
+    const conn = await oracledb.getConnection({
+      user: process.env.ORACLE_USER,
+      password: process.env.ORACLE_PASSWORD,
+      connectString: process.env.ORACLE_CONNECT_STRING,
+    });
+
+    console.log('Conexión exitosa!');
+    await conn.close();
+  } catch (err) {
+    console.error('Error al conectar:', err);
+  }
+}
+
+testConnection();
