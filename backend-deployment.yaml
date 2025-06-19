@@ -41,7 +41,7 @@ spec:
                   name: oracle-backend-secret
                   key: ORACLE_PASSWORD
             - name: ORACLE_CONFIG_DIR
-              value: "/opt/oracle/wallet"
+              value: "/opt/oracle/wallet/Wallet_CGTEST"
             - name: ORACLE_LIB_DIR
               value: "/opt/oracle/instantclient/instantclient_21_18"
           imagePullPolicy: Never

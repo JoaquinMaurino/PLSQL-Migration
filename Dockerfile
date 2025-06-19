@@ -26,7 +26,7 @@ RUN apt-get update && \
 
 # Crear directorios para el Instant Client y la Wallet
 RUN mkdir -p /opt/oracle/instantclient
-RUN mkdir -p /opt/oracle/wallet
+RUN mkdir -p /opt/oracle/wallet/Wallet_CGTEST
 
 # Copia los archivos comprimidos del Instant Client al contenedor
 # Asume que están en una carpeta 'oracle-instantclient' al mismo nivel que tu Dockerfile

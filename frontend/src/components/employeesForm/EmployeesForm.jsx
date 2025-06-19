@@ -72,8 +72,8 @@ const EmployeesForm = ({ mode = 'create', employeeData = null, onClose }) => {
     };
 
     const url = mode === 'edit'
-      ? `http://localhost:3000/empleados/${employeeData.EMPLOYEE_ID}`
-      : 'http://localhost:3000/empleados';
+      ? `http://localhost:31325/empleados/${employeeData.EMPLOYEE_ID}`
+      : 'http://localhost:31325/empleados';
 
     const method = mode === 'edit' ? 'PUT' : 'POST';
 

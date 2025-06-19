@@ -21,7 +21,7 @@ const EmployeesTable = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await fetch('http://localhost:3000/empleados');
+        const res = await fetch('http://localhost:31325/empleados');
         const data = await res.json();
         setEmployees(data);
         setCurrentPage(1);
@@ -38,7 +38,7 @@ const EmployeesTable = () => {
     if (!confirm) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/empleados/${id}`, {
+      const res = await fetch(`http://localhost:31325/empleados/${id}`, {
         method: 'DELETE',
       });
       const msg = await res.text();
