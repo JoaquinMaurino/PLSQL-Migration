@@ -21,7 +21,7 @@ const EmployeesTable = () => {
   useEffect(() => {
     const fetchEmployees = async () => {
       try {
-        const res = await fetch('http://localhost:3000/empleados');
+        const res = await fetch('http://nestjs-oracle-backend-service:3000/empleados');
         const data = await res.json();
         setEmployees(data);
         setCurrentPage(1);

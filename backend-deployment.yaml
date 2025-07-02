@@ -17,6 +17,7 @@ spec:
       containers:
         - name: nestjs-oracle-backend-container
           image: nestjs-oracle-backend:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 3000
           env:
@@ -30,18 +31,37 @@ spec:
                 configMapKeyRef:
                   name: oracle-backend-config
                   key: ORACLE_CONNECT_STRING
-            - name: PORT
-              valueFrom:
-                configMapKeyRef:
-                  name: oracle-backend-config
-                  key: PORT
             - name: ORACLE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: oracle-backend-secret
                   key: ORACLE_PASSWORD
-            - name: ORACLE_CONFIG_DIR
-              value: "/opt/oracle/wallet"
-            - name: ORACLE_LIB_DIR
-              value: "/opt/oracle/instantclient/instantclient_21_18"
-          imagePullPolicy: Never
+            - name: PORT
+              value: "3000"
+            - name: TNS_ADMIN # ¡MUY IMPORTANTE! Esta variable debe apuntar a la ruta donde se montará la wallet.
+              value: "/opt/oracle/wallet/Wallet_CGTEST"
+          volumeMounts: # <-- NUEVO: Monta el Secret como un volumen
+            - name: oracle-wallet-volume
+              mountPath: "/opt/oracle/wallet/Wallet_CGTEST" # Ruta dentro del contenedor donde se montará la wallet
+              readOnly: true # Se recomienda que sea de solo lectura
+      volumes: # <-- NUEVO: Define el volumen que usará el Secret
+        - name: oracle-wallet-volume
+          secret:
+            secretName: oracle-backend-secret # Nombre del Secret que contiene los archivos de la wallet
+            items: # Especifica qué claves del Secret se montarán como archivos y sus nombres
+              - key: cwallet.sso
+                path: cwallet.sso
+              - key: ewallet.p12
+                path: ewallet.p12
+              - key: ewallet.pem
+                path: ewallet.pem
+              - key: keystore.jks
+                path: keystore.jks
+              - key: ojdbc.properties
+                path: ojdbc.properties
+              - key: sqlnet.ora
+                path: sqlnet.ora
+              - key: tnsnames.ora
+                path: tnsnames.ora
+              - key: truststore.jks
+                path: truststore.jks

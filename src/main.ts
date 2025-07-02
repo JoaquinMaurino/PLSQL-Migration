@@ -17,9 +17,10 @@ async function bootstrap() {
         transform: true, // convierte payloads a instancias de clase automaticamente
       }),
     );
-    await app.listen(process.env.PORT || 3000);
+    const port = process.env.PORT || 3000
+    await app.listen(port);
 
-    logger.log('✅ NestJS backend corriendo en el puerto 3000');
+    logger.log(`✅ NestJS backend corriendo en el puerto ${port}`);
   } catch (error) {
     logger.error('Error al iniciar la app de nestjs: ', error);
   }

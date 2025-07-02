@@ -7,12 +7,7 @@ WORKDIR /app
 # Copia los archivos package.json y package-lock.json (o yarn.lock) para instalar dependencias
 COPY package*.json ./
 
-# Instala las dependencias de Node.js.
-# Usamos --silent para reducir la verbosidad.
-# Instala node-oracledb primero para asegurar que se compilen correctamente las dependencias nativas
-# RUN npm install --silent
-
-# Mejorar esta parte: Instalar dependencias del sistema para Oracle Instant Client
+# Instala dependencias del sistema para Oracle Instant Client
 # 'lts-slim' es una imagen basada en Debian. 'apt-get' es el gestor de paquetes.
 # libaio1 es CRUCIAL para el Instant Client de Oracle en Linux.
 # libnsl y libstdc++6 también son dependencias comunes.
@@ -26,7 +21,7 @@ RUN apt-get update && \
 
 # Crear directorios para el Instant Client y la Wallet
 RUN mkdir -p /opt/oracle/instantclient
-RUN mkdir -p /opt/oracle/wallet
+RUN mkdir -p /opt/oracle/wallet # Este directorio será el punto de montaje para el Secret
 
 # Copia los archivos comprimidos del Instant Client al contenedor
 # Asume que están en una carpeta 'oracle-instantclient' al mismo nivel que tu Dockerfile
@@ -42,16 +37,14 @@ RUN unzip -o /tmp/instantclient-basic-linux.x64-21.18.0.0.0dbru.zip -d /opt/orac
     ln -s /opt/oracle/instantclient/instantclient_21_18 /opt/oracle/instantclient/current_version && \
     chmod -R 755 /opt/oracle/instantclient/instantclient_21_18 # Asegura permisos de ejecución/lectura
 
-# Copia la wallet al directorio correcto
-# Asume que la wallet está en una carpeta 'wallet/Wallet_CGTEST' al mismo nivel que tu Dockerfile
-COPY wallet/Wallet_CGTEST /opt/oracle/wallet/Wallet_CGTEST
-
 # Configura las variables de entorno para Oracle Instant Client
 # LD_LIBRARY_PATH DEBE apuntar al directorio donde están las librerías .so
 ENV LD_LIBRARY_PATH="/opt/oracle/instantclient/instantclient_21_18:${LD_LIBRARY_PATH}"
 # Opcional: añade el Instant Client al PATH
 ENV PATH="/opt/oracle/instantclient/instantclient_21_18:${PATH}"
 
+# La variable TNS_ADMIN indica dónde la aplicación buscará la wallet.
+# Esta ruta debe coincidir con el mountPath del volumen en el Deployment.
 ENV TNS_ADMIN="/opt/oracle/wallet/Wallet_CGTEST"
 
 # Copia el resto de los archivos de tu aplicación
